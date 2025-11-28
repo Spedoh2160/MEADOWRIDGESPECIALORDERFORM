@@ -1,0 +1,11 @@
+{
+  "name": "meadowridge-special-order-form",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx netlify dev"  
+  },
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}

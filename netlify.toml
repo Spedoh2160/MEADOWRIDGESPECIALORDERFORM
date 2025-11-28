@@ -1,0 +1,8 @@
+# /netlify.toml  (MUST be at repo root, committed)
+[functions]
+  directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/order"
+  to   = "/.netlify/functions/order"
+  status = 200
