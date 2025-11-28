@@ -1,0 +1,457 @@
+<!-- /public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Order Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --gap:12px; --radius:12px; --pad:14px; }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; background:#f6f7f9; color:#1f2937; }
+    header.site { background:#111827; color:#fff; }
+    .site-inner { max-width: 980px; margin: 0 auto; display:flex; align-items:center; gap:14px; padding:14px 18px; }
+    .logo { width:44px; height:44px; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .logo img { width:100%; height:100%; object-fit:cover; }
+    .brand h1 { font-size:18px; margin:0; }
+    .brand .sub { font-size:12px; opacity:.8; margin-top:2px; }
+    .container { max-width: 950px; margin: 24px auto 40px; background:#fff; border-radius: var(--radius); padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
+    h2,h3 { margin: 0 0 8px; }
+    p.hint { margin: 0 0 24px; color:#6b7280; }
+    .grid { display:grid; grid-template-columns: repeat(12, 1fr); gap: var(--gap); }
+    .col-6 { grid-column: span 6; }
+    .col-12 { grid-column: span 12; }
+    label { display:block; font-weight:600; margin-bottom:6px; }
+    input, select, textarea { width:100%; padding: var(--pad); border:1px solid #e5e7eb; border-radius:10px; background:#fff; }
+    input:focus, select:focus, textarea:focus { outline:none; border-color:#111827; box-shadow:0 0 0 3px rgba(17,24,39,.1); }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom:1px solid #f0f0f0; text-align:left; }
+    th { background:#fafafa; font-size: 14px; }
+    tfoot td { font-weight:700; }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#111827; color:#fff; cursor:pointer; }
+    .btn.secondary { background:#fff; color:#111827; }
+    .btn.danger { background:#b91c1c; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .right { text-align:right; }
+    .totals { margin-top: 12px; display:grid; grid-template-columns: 1fr auto; gap: 8px; align-items:center; }
+    .pill { background:#f9fafb; padding:10px 12px; border-radius:10px; border:1px solid #eef1f4; }
+    .toast { position: fixed; right:20px; bottom:20px; padding:12px 14px; border-radius:10px; background:#111827; color:#fff; display:none; }
+    .toast.error { background:#b91c1c; }
+    .muted { color:#6b7280; font-size: 13px; }
+    .sr { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    /* Readonly price styling */
+    input[readonly].price { background:#f9fafb; cursor:not-allowed; color:#374151; }
+    /* Hide number spinners */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    /* Remove spinners in Chrome/Safari/Edge */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Remove spinners in Firefox (and satisfy VS Code linter) */
+input[type="number"] {
+  appearance: textfield;      /* standard property (fixes warning) */
+  -moz-appearance: textfield; /* Firefox */
+}
+    /* Catalog cards */
+    .catalog { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:14px; margin-top:10px; }
+    .card { border:1px solid #eef1f4; border-radius:12px; padding:12px; background:#fff; }
+    .card h4 { margin:4px 0 8px; font-size:16px; }
+    .tag { display:inline-block; background:#f3f4f6; border:1px solid #e5e7eb; border-radius:999px; padding:2px 8px; font-size:12px; margin-left:6px; }
+  </style>
+</head>
+<body>
+  <!-- Header with Logo -->
+  <header class="site">
+    <div class="site-inner">
+      <div class="logo">
+        <!-- Replace /logo.png with your asset -->
+        <img src="/logo.png" alt="Company Logo" onerror="this.style.display='none'" />
+      </div>
+      <div class="brand">
+        <h1>Meadow Ridge Pet Lodge — Pre-Grand Opening Specials</h1>
+        <div class="sub">Boarding • Day Care • Gift Cards</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Editable Catalog (FULL/REGULAR PRICES you can change manually) -->
+  <div class="container">
+    <section aria-labelledby="catalogTitle">
+      <h1>Shop our Big Savings Pre-Grand Opening Event!</h1>
+      <p>We are offering our Facebook Followers and Friends amazing deals prior to our Grand Opening later this Winter. All packages are discounted 15%
+        off regular prices and all gift cards are discounted 10% off face value.</p>
+      <h2>How It Works</h2>
+      <p>Simply complete the form below with your name and contact information, and select the special package pricing you're interested in. We will 
+        reach out to you in the coming days by phone to answer questions you may have about our services and process your payment. Gift cards and packages
+        will be mailed to you upon completion of payment.</p>
+      <h2 id="catalogTitle">Packages & Discounts</h2>
+      <p class="hint">
+        Prices shown here are <strong>full/regular</strong> for transparency. The order form applies any special pricing automatically.
+      </p>
+
+      <div id="catalog" class="catalog">
+        <!-- ✅ Edit anything in this block -->
+        <div class="card">
+          <h4>Cat Boarding <span class="tag">Full Price (Special Price)</span></h4>
+          <ul>
+            <li>10 Day: <strong>$350.00 ($297.50)</strong> — Cozy condos, daily playtime.</li>
+            <li>20 Day: <strong>$660.00 ($561.00)</strong> — Save with a longer stay.</li>
+            <li>30 Day: <strong>$900.00 ($765.00)</strong> — Best value monthly plan.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>Dog Boarding <span class="tag">Full Price (Special Price)</span></h4>
+          <ul>
+            <li>10 Day: <strong>$450.00 ($382.50)</strong> — Standard suite and play time</li>
+            <li>20 Day: <strong>$860.00 ($731.00)</strong> — Includes enrichment time.</li>
+            <li>30 Day: <strong>$1200.00 ($1020.00)</strong> — Month-long package.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>Presidential Suite (Dog) <span class="tag">Full Price (Special Price)</span></h4>
+          <ul>
+            <li>10 Day: <strong>$640.00 ($544.00)</strong> — Private room, special amendities</li>
+            <li>20 Day: <strong>$1,230.00 (1045.50)</strong> — Premium treats included.</li>
+            <li>30 Day: <strong>$1,710.00 (1453.50)</strong> — VIP package.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>Dog Day Care — Half Days <span class="tag">Full Price (Special Price)</span></h4>
+          <ul>
+            <li>10 Day: <strong>$240.00 ($204.00)</strong></li>
+            <li>20 Day: <strong>$455.00 ($386.75)</strong></li>
+            <li>30 Day: <strong>$630.00 ($535.50)</strong></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>Dog Day Care — Full Days <span class="tag">Full Price (Special Price)</span></h4>
+          <ul>
+            <li>10 Day: <strong>$355.00 ($301.75)</strong></li>
+            <li>20 Day: <strong>$680.00 (578.00)</strong></li>
+            <li>30 Day: <strong>$945.00 ($803.25)</strong></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h4>Gift Cards <span class="tag">Face Value (Special Price)</span></h4>
+          <ul>
+            <li>$50 Gift Card — <strong>$50.00 ($45.00)</strong></li>
+            <li>$100 Gift Card — <strong>$100.00 ($90.00)</strong></li>
+            <li>$200 Gift Card — <strong>$200.00 ($180.00)</strong></li>
+            <li>$300 Gift Card — <strong>$300.00 ($270.00)</strong></li>
+            <li>$400 Gift Card — <strong>$400.00 ($360.00)</strong></li>
+            <li>$500 Gift Card — <strong>$500.00 ($450.00)</strong></li>
+          </ul>
+          <p class="muted" style="margin-top:6px;">Special pricing only applies during promotions.</p>
+        </div>
+        <!-- ✅ End editable block -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Order Form (uses fixed discounted prices; qty-only) -->
+  <div class="container">
+    <h2>Order Form</h2>
+    <h3>Instructions</h3>
+      <ol>
+        <li>Select Item</li>
+        <li>Select Item to Purchase (ie: "Dog Boarding 20 Day")</li>
+        <li>Select Quantity of Packages to purchase</li>
+        <li>Add additional items as necessary by clicking "add item"</li>
+        <li>Verify Purchase Amount</li>
+        <li>Click Submit Order</li>
+        <li>We will contact you by phone to answer any questions and process your payment</li>
+      </ol>
+    <p class="hint">Select items, set quantities, confirm totals, then submit. Unit prices are fixed.</p>
+
+    <form id="orderForm" novalidate>
+      <div class="grid">
+        <div class="col-6">
+          <label for="customerName">Customer Name</label>
+          <input id="customerName" name="customerName" autocomplete="name" required placeholder="Full Name Required"/>
+        </div>
+        <div class="col-6">
+          <label for="customerEmail">Customer Email</label>
+          <input id="customerEmail" name="customerEmail" type="email" autocomplete="email" required placeholder="Email Address Required"/>
+        </div>
+        <div class="col-6">
+          <label for="customerPhone">Phone</label>
+          <input id="customerPhone" name="customerPhone" autocomplete="tel" placeholder="Phone Number is Required"/>
+        </div>
+        <div class="col-6">
+          <label for="orderDate">Order Date</label>
+          <input id="orderDate" name="orderDate" type="date" required />
+        </div>
+        <div class="col-12">
+          <label for="shippingAddress">Address</label>
+          <textarea id="shippingAddress" name="shippingAddress" rows="2" placeholder="Street, City, State, ZIP - Required"></textarea>
+        </div>
+      </div>
+
+      <h3 style="margin-top:24px;">Items</h3>
+      <div class="muted" style="margin-bottom:8px;">Choose a preset item; unit price is fixed (quantity only).</div>
+      <div class="actions" style="margin:10px 0 14px;">
+        <button type="button" id="addRowBtn" class="btn">+ Add Item</button>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table id="itemsTable" aria-describedby="itemsHelp">
+          <thead>
+            <tr>
+              <th style="width:36%;">Item</th>
+              <th style="width:16%;">Unit Price (fixed)</th>
+              <th style="width:16%;">Qty</th>
+              <th style="width:16%;">Line Total</th>
+              <th style="width:16%;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+      </div>
+      <div id="itemsHelp" class="sr">Edit item rows to update totals.</div>
+
+      <div class="grid" style="margin-top:16px;">
+        <div class="col-6">
+          <label for="taxPercent">Tax Percentage (%)</label>
+          <input id="taxPercent" name="taxPercent" type="number" min="0" max="100" step="0.01" value="6.25" />
+          <div class="muted">Set to 0 if not applicable.</div>
+        </div>
+        <div class="col-6">
+          <div class="totals">
+            <div class="right">Subtotal</div><div class="pill right" id="subtotalDisplay">$0.00</div>
+            <div class="right">Tax</div><div class="pill right" id="taxDisplay">$0.00</div>
+            <div class="right">Grand Total</div><div class="pill right" id="grandTotalDisplay">$0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top:22px;">
+        <button type="submit" class="btn">Submit Order</button>
+        <button type="button" id="resetBtn" class="btn secondary">Reset</button>
+      </div>
+      <div class="muted" style="margin-top:10px;">By submitting, you agree the order will be emailed to the merchant.</div>
+    </form>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // Fixed discounted prices used at checkout
+    const PRESET_ITEMS = [
+      { label: "Cat Boarding 10 Day", price: 297.50 },
+      { label: "Cat Boarding 20 Day", price: 561.00 },
+      { label: "Cat Boarding 30 Day", price: 765.00 },
+      { label: "Dog Boarding 10 Day", price: 382.50 },
+      { label: "Dog Boarding 20 Day", price: 731.00 },
+      { label: "Dog Boarding 30 Day", price: 1020.00 },
+      { label: "Presidential Suite Dog Boarding 10 Day", price: 544.00 },
+      { label: "Presidential Suite Dog Boarding 20 Day", price: 1045.50 },
+      { label: "Presidential Suite Dog Boarding 30 Day", price: 1453.50 },
+      { label: "Half Days Dog Day Care 10 Day", price: 204.00 },
+      { label: "Half Days Dog Day Care 20 Day", price: 386.75 },
+      { label: "Half Days Dog Day Care 30 Day", price: 535.50 },
+      { label: "Full Days Dog Day Care 10 Day", price: 301.75 },
+      { label: "Full Days Dog Day Care 20 Day", price: 578.00 },
+      { label: "Full Days Dog Day Care 30 Day", price: 803.25 },
+      { label: "Gift Card $50.00", price: 45.00 },
+      { label: "Gift Card $100.00", price: 90.00 },
+      { label: "Gift Card $200.00", price: 180.00 },
+      { label: "Gift Card $300.00", price: 270.00 },
+      { label: "Gift Card $400.00", price: 360.00 },
+      { label: "Gift Card $500.00", price: 450.00 }
+    ];
+
+    const $ = (sel) => document.querySelector(sel);
+    const itemsBody = $("#itemsBody");
+    const taxInput = $("#taxPercent");
+    const subtotalDisplay = $("#subtotalDisplay");
+    const taxDisplay = $("#taxDisplay");
+    const grandTotalDisplay = $("#grandTotalDisplay");
+    const toast = $("#toast");
+
+    function money(n) { return n.toLocaleString(undefined, { style: "currency", currency: "USD" }); }
+    function clamp(n, min, max) { return Math.min(Math.max(n, min), max); }
+
+    function rowTemplate(idx, item = { name: "", price: 0, qty: 1 }) {
+      const options = PRESET_ITEMS.map(p => `<option value="${p.label}" data-price="${p.price.toFixed(2)}">${p.label}</option>`).join("");
+      return `
+        <tr data-row="${idx}">
+          <td>
+            <select class="item-select" aria-label="Item preset">
+              <option value="">— Select —</option>
+              ${options}
+            </select>
+            <input class="item-name" placeholder="Item name" value="${item.name || ""}" style="margin-top:6px;" />
+          </td>
+          <td>
+            <input class="item-price price" type="number" min="0" step="0.01" value="${(+item.price).toFixed(2)}"
+                   readonly aria-readonly="true" tabindex="-1" onfocus="this.blur()" onwheel="this.blur()" />
+          </td>
+          <td><input class="item-qty" type="number" min="1" step="1" value="${clamp(+item.qty || 1, 1, 9999)}" /></td>
+          <td class="line-total">$0.00</td>
+          <td>
+            <div class="actions">
+              <button type="button" class="btn secondary copy-row">Duplicate</button>
+              <button type="button" class="btn danger remove-row">Remove</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function addRow(prefill) {
+      const idx = itemsBody.children.length;
+      itemsBody.insertAdjacentHTML("beforeend", rowTemplate(idx, prefill));
+      recompute();
+    }
+
+    function showToast(msg, isError=false) {
+      toast.textContent = msg;
+      toast.classList.toggle("error", isError);
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 2800);
+    }
+
+    function parseRows() {
+      const rows = [...itemsBody.querySelectorAll("tr")];
+      return rows.map(tr => {
+        const name = tr.querySelector(".item-name").value.trim();
+        const price = +tr.querySelector(".item-price").value;
+        const qty = Math.round(+tr.querySelector(".item-qty").value);
+        const line = Math.max(price, 0) * Math.max(qty, 0);
+        return { name, price, qty, line, tr };
+      }).filter(r => r.name && r.qty > 0);
+    }
+
+    function recompute() {
+      const rows = parseRows();
+      let subtotal = 0;
+      rows.forEach(({ line, tr }) => {
+        subtotal += line;
+        tr.querySelector(".line-total").textContent = money(line);
+      });
+      const taxPct = clamp(+taxInput.value || 0, 0, 100);
+      const tax = subtotal * (taxPct / 100);
+      const grand = subtotal + tax;
+
+      subtotalDisplay.textContent = money(subtotal);
+      taxDisplay.textContent = money(tax);
+      grandTotalDisplay.textContent = money(grand);
+      return { rows, subtotal, taxPct, tax, grand };
+    }
+
+    function bindTableEvents() {
+      itemsBody.addEventListener("input", (e) => {
+        if (e.target.matches(".item-select")) {
+          const opt = e.target.selectedOptions[0];
+          const price = opt?.dataset?.price;
+          const tr = e.target.closest("tr");
+          const nameInput = tr.querySelector(".item-name");
+          const priceInput = tr.querySelector(".item-price");
+          if (opt && e.target.value) {
+            nameInput.value = e.target.value;
+            if (price !== undefined) priceInput.value = (+price).toFixed(2); // fixed price
+          }
+          recompute();
+        } else if (e.target.matches(".item-qty") || e.target.matches(".item-name")) {
+          recompute();
+        }
+      });
+
+      // Hard-block editing price
+      itemsBody.addEventListener("keydown", (e) => {
+        if (e.target.matches(".item-price")) e.preventDefault();
+      });
+
+      itemsBody.addEventListener("click", (e) => {
+        if (e.target.closest(".remove-row")) {
+          const tr = e.target.closest("tr");
+          tr.parentElement.removeChild(tr);
+          recompute();
+        }
+        if (e.target.closest(".copy-row")) {
+          const tr = e.target.closest("tr");
+          const dup = {
+            name: tr.querySelector(".item-name").value,
+            price: +tr.querySelector(".item-price").value,
+            qty: +tr.querySelector(".item-qty").value
+          };
+          addRow(dup);
+        }
+      });
+    }
+
+    function serializePayload() {
+      const { rows, subtotal, taxPct, tax, grand } = recompute();
+      return {
+        customer: {
+          name: $("#customerName").value.trim(),
+          email: $("#customerEmail").value.trim(),
+          phone: $("#customerPhone").value.trim(),
+          address: $("#shippingAddress").value.trim(),
+          orderDate: $("#orderDate").value
+        },
+        items: rows.map(r => ({ name: r.name, unitPrice: +r.price, quantity: +r.qty, lineTotal: +r.line })),
+        totals: { subtotal, taxPercent: taxPct, taxAmount: tax, grandTotal: grand }
+      };
+    }
+
+    function validForm(payload) {
+      if (!payload.customer.name) return "Customer name is required.";
+      if (!payload.customer.email || !/^\S+@\S+\.\S+$/.test(payload.customer.email)) return "Valid email is required.";
+      if (!payload.customer.orderDate) return "Order date is required.";
+      if (!payload.items.length) return "Add at least one item with name and quantity.";
+      if (payload.items.some(i => i.unitPrice < 0 || i.quantity <= 0)) return "Invalid price or quantity.";
+      if (payload.totals.taxPercent < 0 || payload.totals.taxPercent > 100) return "Tax % must be between 0 and 100.";
+      return null;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      $("#orderDate").valueAsDate = new Date();
+      addRow({ name: "", price: 0, qty: 1 }); // start blank
+      bindTableEvents();
+      taxInput.addEventListener("input", recompute);
+
+      $("#addRowBtn").addEventListener("click", () => addRow({ name: "", price: 0, qty: 1 }));
+      $("#resetBtn").addEventListener("click", () => {
+        document.getElementById("orderForm").reset();
+        itemsBody.innerHTML = "";
+        addRow({ name: "", price: 0, qty: 1 });
+        recompute();
+      });
+
+      document.getElementById("orderForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const payload = serializePayload();
+        const err = validForm(payload);
+        if (err) { showToast(err, true); return; }
+
+        try {
+          const res = await fetch("/api/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.error || "Failed to submit order.");
+          showToast("Order submitted. Confirmation sent.");
+          document.getElementById("orderForm").reset();
+          itemsBody.innerHTML = "";
+          addRow({ name: "", price: 0, qty: 1 });
+          recompute();
+        } catch (ex) {
+          showToast(ex.message || "Network error.", true);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
