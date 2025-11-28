@@ -1,4 +1,3 @@
-# /netlify.toml  (MUST be at repo root, committed)
 [functions]
   directory = "netlify/functions"
 
