@@ -1,4 +1,3 @@
-// /netlify/functions/order.js
 const nodemailer = require("nodemailer");
 
 const isEmail = (s) => /^\S+@\S+\.\S+$/.test(s);
@@ -16,9 +15,14 @@ function validatePayload(p) {
   return null;
 }
 
+function isGiftCard(name) {
+  return /gift\s*card/i.test(name || "");
+}
+
 function recomputeTotals(items, taxPercent) {
   const subtotal = items.reduce((s, i) => s + (i.unitPrice * i.quantity), 0);
-  const taxAmount = subtotal * (taxPercent / 100);
+  const taxableSubtotal = items.reduce((s, i) => s + (isGiftCard(i.name) ? 0 : (i.unitPrice * i.quantity)), 0);
+  const taxAmount = taxableSubtotal * (taxPercent / 100);
   const grandTotal = subtotal + taxAmount;
   return { subtotal, taxAmount, grandTotal };
 }
@@ -62,7 +66,7 @@ function renderMerchantHTML(payload, totals) {
       <tbody>${rows}</tbody>
       <tfoot>
         <tr><td colspan="3" align="right" style="padding:8px;">Subtotal</td><td style="padding:8px;">${currency(totals.subtotal)}</td></tr>
-        <tr><td colspan="3" align="right" style="padding:8px;">Tax (${payload.totals.taxPercent}%)</td><td style="padding:8px;">${currency(totals.taxAmount)}</td></tr>
+        <tr><td colspan="3" align="right" style="padding:8px;">Tax (${(Number(payload.totals.taxPercent) || 0).toFixed(2)}%)</td><td style="padding:8px;">${currency(totals.taxAmount)}</td></tr>
         <tr><td colspan="3" align="right" style="padding:8px;"><strong>Grand Total</strong></td><td style="padding:8px;"><strong>${currency(totals.grandTotal)}</strong></td></tr>
       </tfoot>
     </table>
@@ -209,10 +213,10 @@ exports.handler = async (event) => {
       subject: merchantSubject,
       text: merchantText,
       html: merchantHTML,
-      replyTo: payload.customer.email // WHY: Let you reply straight to the customer
+      replyTo: payload.customer.email
     });
 
-    // Send confirmation to customer (nice thank you note)
+    // Send confirmation to customer
     const allowCustomer = String(SEND_CUSTOMER_CONFIRMATION || "true").toLowerCase() === "true";
     if (allowCustomer && payload.customer.email) {
       const brand = BRAND_NAME || "";
@@ -226,7 +230,7 @@ exports.handler = async (event) => {
         subject: customerSubject,
         text: customerText,
         html: customerHTML,
-        replyTo: TO_EMAIL // WHY: Customer replies go to your inbox
+        replyTo: TO_EMAIL
       });
     }
 

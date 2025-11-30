@@ -157,22 +157,23 @@ input[type="number"] {
     </section>
   </div>
 
-  <!-- Order Form (uses fixed discounted prices; qty-only) -->
+  <!-- Order Form -->
   <div class="container">
     <h2>Order Form</h2>
     <h3>Instructions</h3>
-      <ol>
-        <li>Select Item</li>
-        <li>Select Item to Purchase (ie: "Dog Boarding 20 Day")</li>
-        <li>Select Quantity of Packages to purchase</li>
-        <li>Add additional items as necessary by clicking "add item"</li>
-        <li>Verify Purchase Amount</li>
-        <li>Click Submit Order</li>
-        <li>We will contact you by phone to answer any questions and process your payment</li>
-      </ol>
+    <ol>
+      <li>Select Item</li>
+      <li>Select Item to Purchase (ie: "Dog Boarding 20 Day")</li>
+      <li>Select Quantity of Packages to purchase</li>
+      <li>Add additional items as necessary by clicking "add item"</li>
+      <li>Verify Purchase Amount</li>
+      <li>Click Submit Order</li>
+      <li>We will contact you by phone to answer any questions and process your payment</li>
+    </ol>
     <p class="hint">Select items, set quantities, confirm totals, then submit. Unit prices are fixed.</p>
 
     <form id="orderForm" novalidate>
+      <!-- customer fields (unchanged) -->
       <div class="grid">
         <div class="col-6">
           <label for="customerName">Customer Name</label>
@@ -222,7 +223,7 @@ input[type="number"] {
         <div class="col-6">
           <label for="taxPercent">Tax Percentage (%)</label>
           <input id="taxPercent" name="taxPercent" type="number" min="0" max="100" step="0.01" value="6.20" />
-          <div class="muted">Set to 0 if not applicable.</div>
+          <div class="muted">Gift cards are <strong>not taxed</strong>. Set to 0 if not applicable.</div>
         </div>
         <div class="col-6">
           <div class="totals">
@@ -279,6 +280,7 @@ input[type="number"] {
 
     function money(n) { return n.toLocaleString(undefined, { style: "currency", currency: "USD" }); }
     function clamp(n, min, max) { return Math.min(Math.max(n, min), max); }
+    function isGiftCard(name) { return /gift\s*card/i.test(name || ""); } // tax-exempt
 
     function rowTemplate(idx, item = { name: "", price: 0, qty: 1 }) {
       const options = PRESET_ITEMS.map(p => `<option value="${p.label}" data-price="${p.price.toFixed(2)}">${p.label}</option>`).join("");
@@ -334,12 +336,14 @@ input[type="number"] {
     function recompute() {
       const rows = parseRows();
       let subtotal = 0;
-      rows.forEach(({ line, tr }) => {
+      let taxableSubtotal = 0;
+      rows.forEach(({ name, line, tr }) => {
         subtotal += line;
+        if (!isGiftCard(name)) taxableSubtotal += line; // tax only non-gift-card
         tr.querySelector(".line-total").textContent = money(line);
       });
       const taxPct = clamp(+taxInput.value || 0, 0, 100);
-      const tax = subtotal * (taxPct / 100);
+      const tax = taxableSubtotal * (taxPct / 100);
       const grand = subtotal + tax;
 
       subtotalDisplay.textContent = money(subtotal);
@@ -366,7 +370,6 @@ input[type="number"] {
         }
       });
 
-      // Hard-block editing price
       itemsBody.addEventListener("keydown", (e) => {
         if (e.target.matches(".item-price")) e.preventDefault();
       });
@@ -416,7 +419,7 @@ input[type="number"] {
 
     document.addEventListener("DOMContentLoaded", () => {
       $("#orderDate").valueAsDate = new Date();
-      addRow({ name: "", price: 0, qty: 1 }); // start blank
+      addRow({ name: "", price: 0, qty: 1 });
       bindTableEvents();
       taxInput.addEventListener("input", recompute);
 
@@ -455,3 +458,4 @@ input[type="number"] {
   </script>
 </body>
 </html>
+
